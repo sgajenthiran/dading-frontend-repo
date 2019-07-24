@@ -10,4 +10,3 @@
 	* `git commit -m "meaningful comment"`
 	* `git push`
 * Create a pull request to merge your changes with develop branch
-* dai sathish
