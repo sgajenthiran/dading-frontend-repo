@@ -9,8 +9,7 @@ import { RNS3 } from 'react-native-aws3';
 import ImageResizer from 'react-native-image-resizer';
 import { createStackNavigator } from 'react-navigation'; 
 
-const options = {
-  
+const options = {  
   storageOptions: {
     skipBackup: true,
     path: 'images'
@@ -34,8 +33,7 @@ export default class App extends React.Component {
     }
 
     this.userId = this.props.navigation.getParam("selecteduser").id; //ADD YOUR CUSTOM USER ID
-
-    this.state = { messages: [], capturedImagePath: null };
+    this.state = { messages: [], capturedImagePath: null };    
     this.onSend = this.onSend.bind(this);
     this.renderAddImage = this.renderAddImage.bind(this);
     this.actionSheet = this.actionSheet.bind(this);
@@ -43,45 +41,25 @@ export default class App extends React.Component {
     this.firebaseUserDetailsRef = 'messages/MESSAGE{'+this.firebaseUserDetails+'}';
     this.firebaseMessages = firebase.database()
     .ref(this.firebaseUserDetailsRef); //find a way to get unique
-
-    
-
   }
 
-  componentWillReceiveProps(next) {   
-    
-    console.log("*****************componentWillReceiveProps***************************");
-    
-        this.userId = next.navigation.getParam("selecteduser").id; //ADD YOUR CUSTOM USER ID
-    
-        this.state = { messages: [], capturedImagePath: null };
-        this.onSend = this.onSend.bind(this);
-        this.renderAddImage = this.renderAddImage.bind(this);
-        this.actionSheet = this.actionSheet.bind(this);
-        this.firebaseUserDetails = next.navigation.getParam("firebaseUserDetails");
-        this.firebaseUserDetailsRef = 'messages/MESSAGE{'+this.firebaseUserDetails+'}';
-        this.firebaseMessages = firebase.database()
-      .ref(this.firebaseUserDetailsRef); //find a way to get unique
-
-      this.componentWillMount();
-
-
-      
+  componentWillReceiveProps(next) {    
+    this.userId = next.navigation.getParam("selecteduser").id; //ADD YOUR CUSTOM USER ID
+    this.setState({
+          messages: []
+    });
+    this.firebaseUserDetails = next.navigation.getParam("firebaseUserDetails");
+    this.firebaseUserDetailsRef = 'messages/MESSAGE{'+this.firebaseUserDetails+'}';
+    this.firebaseMessages = firebase.database().ref(this.firebaseUserDetailsRef); //find a way to get unique
+    this.componentWillMount();
   }
-
   
-
-
-
-
   componentWillMount() {
-    //listener live updates
-    console.log("*****************componentWillMount***************************");
-
+    this.firebaseMessages.off('child_added');
     this.firebaseMessages.on('child_added', (child) => {
-      //determine sent or received message
-      //const sendOrReceived = (child.val().userId === this.userId) ? 1 : 2;
-
+    //determine sent or received message
+    //const sendOrReceived = (child.val().userId === this.userId) ? 1 : 2;
+      
       this.handleReceive({
         _id: child.key,
         text: child.val().text,
@@ -92,7 +70,7 @@ export default class App extends React.Component {
           //avatar: child.val().image
         },
         image: (child.val().image === '') ? null : child.val().image
-      });
+      });     
     });
   }
 
@@ -109,15 +87,7 @@ export default class App extends React.Component {
 
       });
   }
-
-  setMessages(messages) {
-    this.conversation = messages;
-    const buffer = messages;
-    this.setState({
-      messages: buffer
-    });
-  }
-
+  
   handleReceive(message = {}) {
       this.setState((previousState) => {
         return {
@@ -199,8 +169,7 @@ export default class App extends React.Component {
   renderAddImage() {
     let icon = (Platform.OS === 'ios') ? 'image' : 'image';
     return (
-      <View>
-        
+      <View>        
         <TouchableOpacity onPress={this.actionSheet}>
           <Icon name={icon} size={33} color="#009688" style={{ padding: 5 }} />
         </TouchableOpacity>
@@ -208,20 +177,20 @@ export default class App extends React.Component {
     );
   }
 
-  render() {    
-    
+  render() {
     return (
       <View style={styles.container}>
         <Header
-                leftComponent={{ icon: 'arrow-back', color: '#fff', onPress: () => {
-                    this.props.navigation.navigate('ChatMain')
-                }}}
-                centerComponent={{ text: this.props.navigation.getParam("selecteduser").name, style: { color: '#fff', fontSize: 18} }}
-                containerStyle={{
-                    backgroundColor: '#fec107',
-                    marginTop: -20
-                  }}
-                />
+          leftComponent={{ icon: 'arrow-back', color: '#fff', onPress: () => {
+             this.props.navigation.navigate('ChatMain')
+          }}}
+          centerComponent={{ text: this.props.navigation.getParam("selecteduser").name, 
+            style: { color: '#fff', fontSize: 18} }}
+            containerStyle={{
+              backgroundColor: '#fec107',
+              marginTop: -20
+            }}
+        />
         <GiftedChat
           messages={this.state.messages}
           onSend={this.onSend}
@@ -235,7 +204,6 @@ export default class App extends React.Component {
       </View>
     );
   }
-
 }
 
 const styles = StyleSheet.create({
